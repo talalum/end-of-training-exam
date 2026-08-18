@@ -1,0 +1,230 @@
+@if (model) {
+<main class="page">
+  <header class="page-header">
+    <a routerLink="/" class="btn btn-ghost">← חזרה לרשימה</a>
+    <div class="header-actions">
+      @if (savedMessage()) {
+        <span class="saved-toast">{{ savedMessage() }}</span>
+      }
+      <span class="status-badge" [class.status-sent]="model.status === 'sent'">
+        {{ model.status === 'sent' ? 'נשלח' : 'טיוטה' }}
+      </span>
+    </div>
+  </header>
+
+  <h1>צ'ק ליסט לבוחן – מבחן מסכם בסיום השתלמות</h1>
+
+  <section class="meta-fields">
+    <label>
+      שם הנבחן
+      <input
+        type="text"
+        [value]="model.examineeName"
+        (change)="model.examineeName = inputValue($event); save()"
+      />
+    </label>
+    <label>
+      שם הבוחן
+      <input
+        type="text"
+        [value]="model.examinerName"
+        (change)="model.examinerName = inputValue($event); save()"
+      />
+    </label>
+    <label>
+      תאריך
+      <input
+        type="date"
+        [value]="model.examDate"
+        (change)="model.examDate = inputValue($event); save()"
+      />
+    </label>
+  </section>
+
+  <!-- חלק 1 - החייאה -->
+  <section class="part-card">
+    <h2>חלק 1 – החייאה</h2>
+    <p class="sub-title">תרחיש החייאה</p>
+    <ul class="checklist">
+      @for (item of part1Items; track item.id) {
+        <li>
+          <label class="checklist-item">
+            <input
+              type="checkbox"
+              [checked]="model.part1.checklist[item.id]"
+              (change)="toggleChecklist(model.part1.checklist, item.id)"
+            />
+            {{ item.label }}
+          </label>
+        </li>
+      }
+    </ul>
+
+    <label class="notes-field">
+      הערות הבוחן
+      <textarea
+        rows="3"
+        [value]="model.part1.notes"
+        (change)="model.part1.notes = inputValue($event); save()"
+      ></textarea>
+    </label>
+
+    <div class="result-row">
+      <span>תוצאה:</span>
+      <label class="radio-item">
+        <input
+          type="radio"
+          name="part1-result"
+          [checked]="model.part1.result === 'pass'"
+          (change)="setResult('part1', 'pass')"
+        />
+        עבר
+      </label>
+      <label class="radio-item">
+        <input
+          type="radio"
+          name="part1-result"
+          [checked]="model.part1.result === 'fail'"
+          (change)="setResult('part1', 'fail')"
+        />
+        לא עבר
+      </label>
+    </div>
+  </section>
+
+  <!-- חלק 2 - מיומנויות טראומה -->
+  <section class="part-card">
+    <h2>חלק 2 – מיומנויות טראומה</h2>
+    <p class="sub-title">על הנבחן לבצע 2 מיומנויות מתוך הרשימה, לפי בחירת הבוחן. כל מיומנות מוערכת בנפרד.</p>
+
+    @for (i of skillIndexes; track i) {
+      <div class="skill-block">
+        <label class="skill-select-label">
+          מיומנות {{ i + 1 }}
+          <select
+            (change)="model.part2.skills[i].skillId = inputValue($event) || null; save()"
+          >
+            <option value="" [selected]="!model.part2.skills[i].skillId">-- בחר/י מיומנות --</option>
+            @for (skill of skillOptions; track skill.id) {
+              <option [value]="skill.id" [selected]="skill.id === model.part2.skills[i].skillId">{{ skill.label }}</option>
+            }
+          </select>
+        </label>
+
+        <p class="sub-title">הערכת הביצוע</p>
+        <ul class="checklist">
+          @for (item of skillCriteria; track item.id) {
+            <li>
+              <label class="checklist-item">
+                <input
+                  type="checkbox"
+                  [checked]="model.part2.skills[i].evaluation[item.id]"
+                  (change)="toggleChecklist(model.part2.skills[i].evaluation, item.id)"
+                />
+                {{ item.label }}
+              </label>
+            </li>
+          }
+        </ul>
+
+        <label class="notes-field">
+          הערות הבוחן למיומנות {{ i + 1 }}
+          <textarea
+            rows="2"
+            [value]="model.part2.skills[i].notes"
+            (change)="model.part2.skills[i].notes = inputValue($event); save()"
+          ></textarea>
+        </label>
+      </div>
+    }
+
+    <label class="notes-field">
+      הערות הבוחן (כלליות לחלק 2)
+      <textarea
+        rows="3"
+        [value]="model.part2.notes"
+        (change)="model.part2.notes = inputValue($event); save()"
+      ></textarea>
+    </label>
+
+    <div class="result-row">
+      <span>תוצאה:</span>
+      <label class="radio-item">
+        <input
+          type="radio"
+          name="part2-result"
+          [checked]="model.part2.result === 'pass'"
+          (change)="setResult('part2', 'pass')"
+        />
+        עבר
+      </label>
+      <label class="radio-item">
+        <input
+          type="radio"
+          name="part2-result"
+          [checked]="model.part2.result === 'fail'"
+          (change)="setResult('part2', 'fail')"
+        />
+        לא עבר
+      </label>
+    </div>
+  </section>
+
+  <!-- חלק 3 - מצבי חירום רפואיים -->
+  <section class="part-card">
+    <h2>חלק 3 – מצבי חירום רפואיים</h2>
+    <p class="sub-title">כל נבחן יקבל תרחיש אחד. יש להקפיד ככל האפשר שכל נבחן יקבל תרחיש שונה.</p>
+
+    <label class="skill-select-label">
+      התרחיש שנבחר
+      <select
+        (change)="model.part3.scenarioId = inputValue($event) || null; save()"
+      >
+        <option value="" [selected]="!model.part3.scenarioId">-- בחר/י תרחיש --</option>
+        @for (scenario of scenarioOptions; track scenario.id) {
+          <option [value]="scenario.id" [selected]="scenario.id === model.part3.scenarioId">{{ scenario.label }}</option>
+        }
+      </select>
+    </label>
+
+    <p class="sub-title">הערכת הנבחן בתרחיש</p>
+    <ul class="checklist">
+      @for (item of scenarioCriteria; track item.id) {
+        <li>
+          <label class="checklist-item">
+            <input
+              type="checkbox"
+              [checked]="model.part3.checklist[item.id]"
+              (change)="toggleChecklist(model.part3.checklist, item.id)"
+            />
+            {{ item.label }}
+          </label>
+        </li>
+      }
+    </ul>
+
+    <label class="notes-field">
+      הערות הבוחן
+      <textarea
+        rows="3"
+        [value]="model.part3.notes"
+        (change)="model.part3.notes = inputValue($event); save()"
+      ></textarea>
+    </label>
+  </section>
+
+  <footer class="actions-bar">
+    <button type="button" class="btn btn-secondary" (click)="save(true)">שמירת טיוטה</button>
+    <button type="button" class="btn btn-primary" (click)="sendEmail()">שליחה במייל</button>
+    <button type="button" class="btn btn-whatsapp" (click)="sendWhatsApp()">שיתוף בוואטסאפ</button>
+    <button type="button" class="btn btn-secondary" (click)="copyFullText()">העתקת טקסט מלא</button>
+    <button type="button" class="btn btn-danger-outline" (click)="deleteAndExit()">מחיקת טופס</button>
+  </footer>
+
+  <p class="disclaimer">
+    שליחה במייל פותחת את תוכנת המייל המוגדרת במכשיר עם תוכן הטופס מוכן לשליחה - יש לבדוק שהמייל אכן נשלח בפועל.
+    בטפסים ארוכים חלק מתוכנות המייל עלולות לקצר את גוף ההודעה - אם זה קורה, אפשר להשתמש בכפתור "העתקת טקסט מלא"
+    ולהדביק את התוכן ידנית. שיתוף בוואטסאפ פותח צ'אט עם טקסט מוכן לבחירת נמען.
+  </p>
+</main>
+}

@@ -1,0 +1,37 @@
+<main class="page">
+  <header class="page-header">
+    <h1>צ'ק ליסט לבוחן – מבחן מסכם</h1>
+    <a class="btn btn-primary" routerLink="/form">+ טופס חדש</a>
+  </header>
+
+  <section class="list-section">
+    <h2>טפסים וטיוטות מ-24 השעות האחרונות</h2>
+
+    @if (forms().length === 0) {
+      <p class="empty-state">אין טפסים או טיוטות מה-24 השעות האחרונות. ניתן להתחיל טופס חדש.</p>
+    } @else {
+      <ul class="forms-list">
+        @for (form of forms(); track form.id) {
+          <li class="form-card">
+            <a class="form-card-link" [routerLink]="['/form', form.id]">
+              <div class="form-card-main">
+                <span class="examinee-name">{{ form.examineeName || 'ללא שם נבחן' }}</span>
+                <span class="status-badge" [class.status-sent]="form.status === 'sent'">
+                  {{ form.status === 'sent' ? 'נשלח' : 'טיוטה' }}
+                </span>
+              </div>
+              <div class="form-card-meta">
+                <span>בוחן: {{ form.examinerName || '-' }}</span>
+                <span>תאריך מבחן: {{ form.examDate || '-' }}</span>
+                <span>עודכן: {{ formattedTime(form.updatedAt) }}</span>
+              </div>
+            </a>
+            <button type="button" class="btn btn-danger-outline" (click)="deleteForm(form, $event)">
+              מחיקה
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</main>

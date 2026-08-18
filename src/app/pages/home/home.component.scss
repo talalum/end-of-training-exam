@@ -1,0 +1,84 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+}
+
+.list-section h2 {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.empty-state {
+  color: #666;
+  padding: 24px;
+  text-align: center;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+}
+
+.forms-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.form-card-link {
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-card-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.examinee-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.form-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.85rem;
+  color: #666;
+}
