@@ -47,6 +47,8 @@ export class FormFillComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.model = this.storage.getById(id) ?? this.storage.createBlank();
+      this.model.dutyNumber ??= '';
+      this.model.branch ??= '';
     } else {
       this.model = this.storage.createBlank();
       this.storage.save(this.model);
@@ -137,6 +139,8 @@ export class FormFillComponent implements OnInit {
     const m = this.model;
 
     if (!m.examineeName.trim()) errors.push({ key: 'examinee-name', label: 'שם הנבחן' });
+    if (!m.dutyNumber.trim()) errors.push({ key: 'duty-number', label: 'מספר כונן' });
+    if (!m.branch.trim()) errors.push({ key: 'branch', label: 'סניף' });
     if (!m.examinerName.trim()) errors.push({ key: 'examiner-name', label: 'שם הבוחן' });
     if (!m.examDate) errors.push({ key: 'exam-date', label: 'תאריך' });
 

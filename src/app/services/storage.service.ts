@@ -55,6 +55,8 @@ export class StorageService {
       updatedAt: now,
       status: 'draft',
       examineeName: '',
+      dutyNumber: '',
+      branch: '',
       examinerName: '',
       examDate: new Date().toISOString().slice(0, 10),
       part1: { checklist: {}, notes: '', result: null },

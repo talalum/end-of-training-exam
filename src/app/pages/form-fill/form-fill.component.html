@@ -24,6 +24,24 @@
         (change)="model.examineeName = inputValue($event); save()"
       />
     </label>
+    <label [class.field-error]="isInvalid('duty-number')">
+      מספר כונן *
+      <input
+        id="duty-number"
+        type="text"
+        [value]="model.dutyNumber"
+        (change)="model.dutyNumber = inputValue($event); save()"
+      />
+    </label>
+    <label [class.field-error]="isInvalid('branch')">
+      סניף *
+      <input
+        id="branch"
+        type="text"
+        [value]="model.branch"
+        (change)="model.branch = inputValue($event); save()"
+      />
+    </label>
     <label [class.field-error]="isInvalid('examiner-name')">
       שם הבוחן *
       <input

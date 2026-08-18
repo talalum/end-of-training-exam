@@ -30,6 +30,8 @@ export class ShareService {
     lines.push("צ'ק ליסט לבוחן – מבחן מסכם בסיום השתלמות");
     lines.push('');
     lines.push(`שם הנבחן: ${form.examineeName || '-'}`);
+    lines.push(`מספר כונן: ${form.dutyNumber || '-'}`);
+    lines.push(`סניף: ${form.branch || '-'}`);
     lines.push(`שם הבוחן: ${form.examinerName || '-'}`);
     lines.push(`תאריך: ${form.examDate || '-'}`);
     lines.push('');

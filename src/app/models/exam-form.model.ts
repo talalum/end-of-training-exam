@@ -19,6 +19,8 @@ export interface ExamForm {
   status: FormStatus;
 
   examineeName: string;
+  dutyNumber: string;
+  branch: string;
   examinerName: string;
   examDate: string;
 
