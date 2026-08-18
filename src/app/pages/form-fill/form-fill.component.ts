@@ -11,6 +11,11 @@ import {
   TRAUMA_SKILLS,
 } from '../../config/exam-config';
 
+interface ValidationError {
+  key: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-form-fill',
   standalone: true,
@@ -28,6 +33,8 @@ export class FormFillComponent implements OnInit {
 
   model!: ExamForm;
   savedMessage = signal<string | null>(null);
+  validationMessage = signal<string | null>(null);
+  invalidFieldKeys = signal<ReadonlySet<string>>(new Set());
 
   constructor(
     private route: ActivatedRoute,
@@ -51,14 +58,22 @@ export class FormFillComponent implements OnInit {
     return (event.target as HTMLInputElement).value;
   }
 
-  toggleChecklist(bucket: Record<string, boolean>, itemId: string): void {
-    bucket[itemId] = !bucket[itemId];
+  setChecklistValue(bucket: Record<string, boolean | undefined>, itemId: string, value: boolean): void {
+    bucket[itemId] = value;
     this.save();
   }
 
   setResult(target: 'part1' | 'part2', value: PassFail): void {
     this.model[target].result = value;
     this.save();
+  }
+
+  isInvalid(key: string): boolean {
+    return this.invalidFieldKeys().has(key);
+  }
+
+  get isFormComplete(): boolean {
+    return this.computeErrors().length === 0;
   }
 
   save(showToast = false): void {
@@ -70,27 +85,97 @@ export class FormFillComponent implements OnInit {
     }
   }
 
-  sendEmail(): void {
-    this.model.status = 'sent';
-    this.save();
-    window.location.href = this.share.buildMailtoUrl(this.model);
+  onSendEmailClick(): void {
+    this.attemptShare(() => {
+      this.model.status = 'sent';
+      this.save();
+      window.location.href = this.share.buildMailtoUrl(this.model);
+    });
   }
 
-  sendWhatsApp(): void {
-    this.model.status = 'sent';
-    this.save();
-    window.open(this.share.buildWhatsAppUrl(this.model), '_blank');
+  onSendWhatsAppClick(): void {
+    this.attemptShare(() => {
+      this.model.status = 'sent';
+      this.save();
+      window.open(this.share.buildWhatsAppUrl(this.model), '_blank');
+    });
   }
 
-  async copyFullText(): Promise<void> {
-    await navigator.clipboard.writeText(this.share.buildSummaryText(this.model));
-    this.savedMessage.set('התוכן המלא הועתק ללוח');
-    setTimeout(() => this.savedMessage.set(null), 2000);
+  onCopyFullTextClick(): void {
+    this.attemptShare(async () => {
+      await navigator.clipboard.writeText(this.share.buildSummaryText(this.model));
+      this.savedMessage.set('התוכן המלא הועתק ללוח');
+      setTimeout(() => this.savedMessage.set(null), 2000);
+    });
   }
 
   deleteAndExit(): void {
     if (!confirm('למחוק את הטופס? לא ניתן לשחזר.')) return;
     this.storage.remove(this.model.id);
     this.router.navigate(['/']);
+  }
+
+  private attemptShare(action: () => void): void {
+    const errors = this.computeErrors();
+    if (errors.length > 0) {
+      this.invalidFieldKeys.set(new Set(errors.map((e) => e.key)));
+      this.validationMessage.set(
+        `יש למלא את השדות הבאים לפני השיתוף: ${errors.map((e) => e.label).join(', ')}`
+      );
+      const firstEl = document.getElementById(errors[0].key);
+      firstEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstEl?.focus();
+      return;
+    }
+    this.invalidFieldKeys.set(new Set());
+    this.validationMessage.set(null);
+    action();
+  }
+
+  private computeErrors(): ValidationError[] {
+    const errors: ValidationError[] = [];
+    const m = this.model;
+
+    if (!m.examineeName.trim()) errors.push({ key: 'examinee-name', label: 'שם הנבחן' });
+    if (!m.examinerName.trim()) errors.push({ key: 'examiner-name', label: 'שם הבוחן' });
+    if (!m.examDate) errors.push({ key: 'exam-date', label: 'תאריך' });
+
+    for (const item of this.part1Items) {
+      if (m.part1.checklist[item.id] === undefined) {
+        errors.push({ key: `part1-check-${item.id}`, label: `${item.label} (חלק 1)` });
+      }
+    }
+    if (!m.part1.notes.trim()) errors.push({ key: 'part1-notes', label: 'הערות הבוחן (חלק 1)' });
+    if (!m.part1.result) errors.push({ key: 'part1-result', label: 'תוצאה (חלק 1)' });
+
+    this.skillIndexes.forEach((i) => {
+      const skill = m.part2.skills[i];
+      if (!skill.skillId) {
+        errors.push({ key: `part2-skill-${i}-select`, label: `מיומנות ${i + 1}` });
+      }
+      for (const item of this.skillCriteria) {
+        if (skill.evaluation[item.id] === undefined) {
+          errors.push({
+            key: `part2-skill-${i}-check-${item.id}`,
+            label: `${item.label} (מיומנות ${i + 1})`,
+          });
+        }
+      }
+      if (!skill.notes.trim()) {
+        errors.push({ key: `part2-skill-${i}-notes`, label: `הערות למיומנות ${i + 1}` });
+      }
+    });
+    if (!m.part2.notes.trim()) errors.push({ key: 'part2-notes', label: 'הערות הבוחן (חלק 2)' });
+    if (!m.part2.result) errors.push({ key: 'part2-result', label: 'תוצאה (חלק 2)' });
+
+    if (!m.part3.scenarioId) errors.push({ key: 'part3-scenario', label: 'התרחיש שנבחר' });
+    for (const item of this.scenarioCriteria) {
+      if (m.part3.checklist[item.id] === undefined) {
+        errors.push({ key: `part3-check-${item.id}`, label: `${item.label} (חלק 3)` });
+      }
+    }
+    if (!m.part3.notes.trim()) errors.push({ key: 'part3-notes', label: 'הערות הבוחן (חלק 3)' });
+
+    return errors;
   }
 }

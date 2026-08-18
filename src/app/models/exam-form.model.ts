@@ -1,8 +1,9 @@
 export type PassFail = 'pass' | 'fail' | null;
 export type FormStatus = 'draft' | 'sent';
 
+/** true = בוצע, false = לא בוצע, undefined/missing = טרם סומן. */
 export interface ChecklistState {
-  [itemId: string]: boolean;
+  [itemId: string]: boolean | undefined;
 }
 
 export interface SkillEvaluation {

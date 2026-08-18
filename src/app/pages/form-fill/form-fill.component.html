@@ -15,25 +15,28 @@
   <h1>צ'ק ליסט לבוחן – מבחן מסכם בסיום השתלמות</h1>
 
   <section class="meta-fields">
-    <label>
-      שם הנבחן
+    <label [class.field-error]="isInvalid('examinee-name')">
+      שם הנבחן *
       <input
+        id="examinee-name"
         type="text"
         [value]="model.examineeName"
         (change)="model.examineeName = inputValue($event); save()"
       />
     </label>
-    <label>
-      שם הבוחן
+    <label [class.field-error]="isInvalid('examiner-name')">
+      שם הבוחן *
       <input
+        id="examiner-name"
         type="text"
         [value]="model.examinerName"
         (change)="model.examinerName = inputValue($event); save()"
       />
     </label>
-    <label>
-      תאריך
+    <label [class.field-error]="isInvalid('exam-date')">
+      תאריך *
       <input
+        id="exam-date"
         type="date"
         [value]="model.examDate"
         (change)="model.examDate = inputValue($event); save()"
@@ -47,32 +50,46 @@
     <p class="sub-title">תרחיש החייאה</p>
     <ul class="checklist">
       @for (item of part1Items; track item.id) {
-        <li>
-          <label class="checklist-item">
-            <input
-              type="checkbox"
-              [checked]="model.part1.checklist[item.id]"
-              (change)="toggleChecklist(model.part1.checklist, item.id)"
-            />
-            {{ item.label }}
-          </label>
+        <li class="check-row" [class.field-error]="isInvalid('part1-check-' + item.id)">
+          <span class="check-label">{{ item.label }}</span>
+          <div class="toggle-pair">
+            <button
+              type="button"
+              id="part1-check-{{ item.id }}"
+              class="toggle-btn toggle-yes"
+              [class.active]="model.part1.checklist[item.id] === true"
+              (click)="setChecklistValue(model.part1.checklist, item.id, true)"
+            >
+              בוצע
+            </button>
+            <button
+              type="button"
+              class="toggle-btn toggle-no"
+              [class.active]="model.part1.checklist[item.id] === false"
+              (click)="setChecklistValue(model.part1.checklist, item.id, false)"
+            >
+              לא ביצע
+            </button>
+          </div>
         </li>
       }
     </ul>
 
-    <label class="notes-field">
-      הערות הבוחן
+    <label class="notes-field" [class.field-error]="isInvalid('part1-notes')">
+      הערות הבוחן *
       <textarea
+        id="part1-notes"
         rows="3"
         [value]="model.part1.notes"
         (change)="model.part1.notes = inputValue($event); save()"
       ></textarea>
     </label>
 
-    <div class="result-row">
-      <span>תוצאה:</span>
+    <div class="result-row" [class.field-error]="isInvalid('part1-result')">
+      <span>תוצאה: *</span>
       <label class="radio-item">
         <input
+          id="part1-result"
           type="radio"
           name="part1-result"
           [checked]="model.part1.result === 'pass'"
@@ -99,9 +116,10 @@
 
     @for (i of skillIndexes; track i) {
       <div class="skill-block">
-        <label class="skill-select-label">
-          מיומנות {{ i + 1 }}
+        <label class="skill-select-label" [class.field-error]="isInvalid('part2-skill-' + i + '-select')">
+          מיומנות {{ i + 1 }} *
           <select
+            id="part2-skill-{{ i }}-select"
             (change)="model.part2.skills[i].skillId = inputValue($event) || null; save()"
           >
             <option value="" [selected]="!model.part2.skills[i].skillId">-- בחר/י מיומנות --</option>
@@ -114,22 +132,35 @@
         <p class="sub-title">הערכת הביצוע</p>
         <ul class="checklist">
           @for (item of skillCriteria; track item.id) {
-            <li>
-              <label class="checklist-item">
-                <input
-                  type="checkbox"
-                  [checked]="model.part2.skills[i].evaluation[item.id]"
-                  (change)="toggleChecklist(model.part2.skills[i].evaluation, item.id)"
-                />
-                {{ item.label }}
-              </label>
+            <li class="check-row" [class.field-error]="isInvalid('part2-skill-' + i + '-check-' + item.id)">
+              <span class="check-label">{{ item.label }}</span>
+              <div class="toggle-pair">
+                <button
+                  type="button"
+                  id="part2-skill-{{ i }}-check-{{ item.id }}"
+                  class="toggle-btn toggle-yes"
+                  [class.active]="model.part2.skills[i].evaluation[item.id] === true"
+                  (click)="setChecklistValue(model.part2.skills[i].evaluation, item.id, true)"
+                >
+                  בוצע
+                </button>
+                <button
+                  type="button"
+                  class="toggle-btn toggle-no"
+                  [class.active]="model.part2.skills[i].evaluation[item.id] === false"
+                  (click)="setChecklistValue(model.part2.skills[i].evaluation, item.id, false)"
+                >
+                  לא ביצע
+                </button>
+              </div>
             </li>
           }
         </ul>
 
-        <label class="notes-field">
-          הערות הבוחן למיומנות {{ i + 1 }}
+        <label class="notes-field" [class.field-error]="isInvalid('part2-skill-' + i + '-notes')">
+          הערות הבוחן למיומנות {{ i + 1 }} *
           <textarea
+            id="part2-skill-{{ i }}-notes"
             rows="2"
             [value]="model.part2.skills[i].notes"
             (change)="model.part2.skills[i].notes = inputValue($event); save()"
@@ -138,19 +169,21 @@
       </div>
     }
 
-    <label class="notes-field">
-      הערות הבוחן (כלליות לחלק 2)
+    <label class="notes-field" [class.field-error]="isInvalid('part2-notes')">
+      הערות הבוחן (כלליות לחלק 2) *
       <textarea
+        id="part2-notes"
         rows="3"
         [value]="model.part2.notes"
         (change)="model.part2.notes = inputValue($event); save()"
       ></textarea>
     </label>
 
-    <div class="result-row">
-      <span>תוצאה:</span>
+    <div class="result-row" [class.field-error]="isInvalid('part2-result')">
+      <span>תוצאה: *</span>
       <label class="radio-item">
         <input
+          id="part2-result"
           type="radio"
           name="part2-result"
           [checked]="model.part2.result === 'pass'"
@@ -175,9 +208,10 @@
     <h2>חלק 3 – מצבי חירום רפואיים</h2>
     <p class="sub-title">כל נבחן יקבל תרחיש אחד. יש להקפיד ככל האפשר שכל נבחן יקבל תרחיש שונה.</p>
 
-    <label class="skill-select-label">
-      התרחיש שנבחר
+    <label class="skill-select-label" [class.field-error]="isInvalid('part3-scenario')">
+      התרחיש שנבחר *
       <select
+        id="part3-scenario"
         (change)="model.part3.scenarioId = inputValue($event) || null; save()"
       >
         <option value="" [selected]="!model.part3.scenarioId">-- בחר/י תרחיש --</option>
@@ -190,22 +224,35 @@
     <p class="sub-title">הערכת הנבחן בתרחיש</p>
     <ul class="checklist">
       @for (item of scenarioCriteria; track item.id) {
-        <li>
-          <label class="checklist-item">
-            <input
-              type="checkbox"
-              [checked]="model.part3.checklist[item.id]"
-              (change)="toggleChecklist(model.part3.checklist, item.id)"
-            />
-            {{ item.label }}
-          </label>
+        <li class="check-row" [class.field-error]="isInvalid('part3-check-' + item.id)">
+          <span class="check-label">{{ item.label }}</span>
+          <div class="toggle-pair">
+            <button
+              type="button"
+              id="part3-check-{{ item.id }}"
+              class="toggle-btn toggle-yes"
+              [class.active]="model.part3.checklist[item.id] === true"
+              (click)="setChecklistValue(model.part3.checklist, item.id, true)"
+            >
+              בוצע
+            </button>
+            <button
+              type="button"
+              class="toggle-btn toggle-no"
+              [class.active]="model.part3.checklist[item.id] === false"
+              (click)="setChecklistValue(model.part3.checklist, item.id, false)"
+            >
+              לא ביצע
+            </button>
+          </div>
         </li>
       }
     </ul>
 
-    <label class="notes-field">
-      הערות הבוחן
+    <label class="notes-field" [class.field-error]="isInvalid('part3-notes')">
+      הערות הבוחן *
       <textarea
+        id="part3-notes"
         rows="3"
         [value]="model.part3.notes"
         (change)="model.part3.notes = inputValue($event); save()"
@@ -213,15 +260,36 @@
     </label>
   </section>
 
+  @if (validationMessage()) {
+    <p class="validation-banner">{{ validationMessage() }}</p>
+  }
+
   <footer class="actions-bar">
     <button type="button" class="btn btn-secondary" (click)="save(true)">שמירת טיוטה</button>
-    <button type="button" class="btn btn-primary" (click)="sendEmail()">שליחה במייל</button>
-    <button type="button" class="btn btn-whatsapp" (click)="sendWhatsApp()">שיתוף בוואטסאפ</button>
-    <button type="button" class="btn btn-secondary" (click)="copyFullText()">העתקת טקסט מלא</button>
+    <button type="button" class="btn btn-primary" [class.btn-locked]="!isFormComplete" (click)="onSendEmailClick()">
+      שליחה במייל
+    </button>
+    <button
+      type="button"
+      class="btn btn-whatsapp"
+      [class.btn-locked]="!isFormComplete"
+      (click)="onSendWhatsAppClick()"
+    >
+      שיתוף בוואטסאפ
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      [class.btn-locked]="!isFormComplete"
+      (click)="onCopyFullTextClick()"
+    >
+      העתקת טקסט מלא
+    </button>
     <button type="button" class="btn btn-danger-outline" (click)="deleteAndExit()">מחיקת טופס</button>
   </footer>
 
   <p class="disclaimer">
+    כל שדות הטופס הם שדות חובה - יש למלא את כולם (כולל סימון "בוצע"/"לא ביצע" עבור כל פריט) לפני שיתוף.
     שליחה במייל פותחת את תוכנת המייל המוגדרת במכשיר עם תוכן הטופס מוכן לשליחה - יש לבדוק שהמייל אכן נשלח בפועל.
     בטפסים ארוכים חלק מתוכנות המייל עלולות לקצר את גוף ההודעה - אם זה קורה, אפשר להשתמש בכפתור "העתקת טקסט מלא"
     ולהדביק את התוכן ידנית. שיתוף בוואטסאפ פותח צ'אט עם טקסט מוכן לבחירת נמען.

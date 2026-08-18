@@ -17,8 +17,11 @@ const resultLabel = (r: 'pass' | 'fail' | null): string =>
 const findLabel = (items: ChecklistItem[], id: string | null): string =>
   items.find((i) => i.id === id)?.label ?? 'לא נבחר';
 
-const checklistLines = (items: ChecklistItem[], state: Record<string, boolean>): string =>
-  items.map((i) => `${state[i.id] ? '☑' : '☐'} ${i.label}`).join('\n');
+const checkMark = (value: boolean | undefined): string =>
+  value === true ? '✓' : value === false ? '✗' : '☐';
+
+const checklistLines = (items: ChecklistItem[], state: Record<string, boolean | undefined>): string =>
+  items.map((i) => `${checkMark(state[i.id])} ${i.label}`).join('\n');
 
 @Injectable({ providedIn: 'root' })
 export class ShareService {
