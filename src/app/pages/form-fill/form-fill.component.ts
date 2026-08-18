@@ -1,8 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamForm, PassFail } from '../../models/exam-form.model';
 import { StorageService } from '../../services/storage.service';
 import { ShareService } from '../../services/share.service';
+import { ImageShareService } from '../../services/image-share.service';
+import { ExamSummaryCardComponent } from '../../components/exam-summary-card/exam-summary-card.component';
 import {
   EMERGENCY_EVALUATION_CRITERIA,
   EMERGENCY_SCENARIOS,
@@ -19,7 +21,7 @@ interface ValidationError {
 @Component({
   selector: 'app-form-fill',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ExamSummaryCardComponent],
   templateUrl: './form-fill.component.html',
   styleUrl: './form-fill.component.scss',
 })
@@ -35,12 +37,17 @@ export class FormFillComponent implements OnInit {
   savedMessage = signal<string | null>(null);
   validationMessage = signal<string | null>(null);
   invalidFieldKeys = signal<ReadonlySet<string>>(new Set());
+  imageShareSupported = signal(false);
+  imageBusy = signal(false);
+
+  @ViewChild('summaryCard', { read: ElementRef }) summaryCardEl?: ElementRef<HTMLElement>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private storage: StorageService,
-    private share: ShareService
+    private share: ShareService,
+    private imageShare: ImageShareService
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +61,7 @@ export class FormFillComponent implements OnInit {
       this.storage.save(this.model);
       this.router.navigate(['/form', this.model.id], { replaceUrl: true });
     }
+    this.imageShareSupported.set(this.imageShare.isImageShareSupported());
   }
 
   inputValue(event: Event): string {
@@ -100,6 +108,33 @@ export class FormFillComponent implements OnInit {
       this.model.status = 'sent';
       this.save();
       window.open(this.share.buildWhatsAppUrl(this.model), '_blank');
+    });
+  }
+
+  onShareImageClick(): void {
+    this.attemptShare(async () => {
+      if (!this.summaryCardEl) return;
+      this.imageBusy.set(true);
+      try {
+        const filename = `sikum-mivchan-${this.model.examDate || 'form'}.png`;
+        const file = await this.imageShare.renderElementToFile(this.summaryCardEl.nativeElement, filename);
+        const result = await this.imageShare.shareImageFile(
+          file,
+          'סיכום מבחן מסכם',
+          `${this.model.examineeName} - ${this.model.examDate}`
+        );
+        if (result === 'shared') {
+          this.model.status = 'sent';
+          this.save();
+          this.savedMessage.set('התמונה שותפה');
+          setTimeout(() => this.savedMessage.set(null), 2000);
+        } else if (result === 'failed') {
+          this.savedMessage.set('השיתוף נכשל - ניתן להשתמש בכפתורי הטקסט כחלופה');
+          setTimeout(() => this.savedMessage.set(null), 4000);
+        }
+      } finally {
+        this.imageBusy.set(false);
+      }
     });
   }
 

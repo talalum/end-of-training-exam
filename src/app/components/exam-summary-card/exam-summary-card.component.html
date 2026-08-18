@@ -1,0 +1,59 @@
+<div class="card">
+  <h1>צ'ק ליסט לבוחן – מבחן מסכם בסיום השתלמות</h1>
+
+  <div class="meta-grid">
+    <div><span class="meta-label">שם הנבחן:</span> {{ form.examineeName || '-' }}</div>
+    <div><span class="meta-label">מספר כונן:</span> {{ form.dutyNumber || '-' }}</div>
+    <div><span class="meta-label">סניף:</span> {{ form.branch || '-' }}</div>
+    <div><span class="meta-label">שם הבוחן:</span> {{ form.examinerName || '-' }}</div>
+    <div><span class="meta-label">תאריך:</span> {{ form.examDate || '-' }}</div>
+  </div>
+
+  <section class="part">
+    <h2>חלק 1 – החייאה</h2>
+    <ul class="check-list">
+      @for (item of part1Items; track item.id) {
+        <li>
+          <span class="mark">{{ checkMark(form.part1.checklist[item.id]) }}</span>
+          {{ item.label }}
+        </li>
+      }
+    </ul>
+    <p class="notes">הערות: {{ form.part1.notes || '-' }}</p>
+    <p class="result">תוצאה: {{ resultLabel(form.part1.result) }}</p>
+  </section>
+
+  <section class="part">
+    <h2>חלק 2 – מיומנויות טראומה</h2>
+    @for (i of skillIndexes; track i) {
+      <div class="skill-block">
+        <h3>מיומנות {{ i + 1 }}: {{ skillLabel(form.part2.skills[i].skillId) }}</h3>
+        <ul class="check-list">
+          @for (item of skillCriteria; track item.id) {
+            <li>
+              <span class="mark">{{ checkMark(form.part2.skills[i].evaluation[item.id]) }}</span>
+              {{ item.label }}
+            </li>
+          }
+        </ul>
+        <p class="notes">הערות: {{ form.part2.skills[i].notes || '-' }}</p>
+      </div>
+    }
+    <p class="notes">הערות הבוחן (כלליות): {{ form.part2.notes || '-' }}</p>
+    <p class="result">תוצאה: {{ resultLabel(form.part2.result) }}</p>
+  </section>
+
+  <section class="part">
+    <h2>חלק 3 – מצבי חירום רפואיים</h2>
+    <p class="scenario">התרחיש שנבחר: {{ scenarioLabel(form.part3.scenarioId) }}</p>
+    <ul class="check-list">
+      @for (item of scenarioCriteria; track item.id) {
+        <li>
+          <span class="mark">{{ checkMark(form.part3.checklist[item.id]) }}</span>
+          {{ item.label }}
+        </li>
+      }
+    </ul>
+    <p class="notes">הערות: {{ form.part3.notes || '-' }}</p>
+  </section>
+</div>

@@ -11,13 +11,13 @@ import {
 } from '../config/exam-config';
 import { ChecklistItem } from '../models/exam-form.model';
 
-const resultLabel = (r: 'pass' | 'fail' | null): string =>
+export const resultLabel = (r: 'pass' | 'fail' | null): string =>
   r === 'pass' ? 'עבר' : r === 'fail' ? 'לא עבר' : 'לא צויין';
 
-const findLabel = (items: ChecklistItem[], id: string | null): string =>
+export const findLabel = (items: ChecklistItem[], id: string | null): string =>
   items.find((i) => i.id === id)?.label ?? 'לא נבחר';
 
-const checkMark = (value: boolean | undefined): string =>
+export const checkMark = (value: boolean | undefined): string =>
   value === true ? '✓' : value === false ? '✗' : '☐';
 
 const checklistLines = (items: ChecklistItem[], state: Record<string, boolean | undefined>): string =>
