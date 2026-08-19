@@ -71,7 +71,7 @@ export const EMERGENCY_EVALUATION_CRITERIA: ChecklistItem[] = [
  * רשימת תפוצה סטטית לשליחת טפסים במייל.
  * ערך placeholder - יש להחליף בכתובות המייל האמיתיות לפני השימוש בפועל.
  */
-export const EMAIL_RECIPIENTS: string[] = ['placeholder@example.com'];
+export const EMAIL_RECIPIENTS: string[] = ['talalum@gmail.com'];
 
 /** מספר טלפון קבוע (אופציונלי, בפורמט בינלאומי ללא +) לשיתוף בוואטסאפ. ריק = הנמען נבחר ידנית בתוך וואטסאפ. */
 export const WHATSAPP_SHARE_PHONE = '';
