@@ -24,7 +24,16 @@
 
 h1 {
   font-size: 1.3rem;
-  margin: 0 0 20px;
+  margin: 0 0 12px;
+}
+
+.usage-hint {
+  color: #555;
+  font-size: 0.85rem;
+  background: #eef1f5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
 }
 
 .meta-fields {
