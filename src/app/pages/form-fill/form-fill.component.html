@@ -1,8 +1,11 @@
 @if (model) {
 <main class="page">
   <header class="page-header">
-    <a routerLink="/" class="btn btn-ghost">← חזרה לרשימה</a>
+    <a [routerLink]="routeBase || '/'" class="btn btn-ghost">← חזרה לרשימה</a>
     <div class="header-actions">
+      @if (isDemo) {
+        <a class="btn btn-ghost" routerLink="/login">← חזרה להתחברות</a>
+      }
       @if (savedMessage()) {
         <span class="saved-toast">{{ savedMessage() }}</span>
       }
@@ -13,6 +16,12 @@
   </header>
 
   <h1>צ'ק ליסט לבוחן – מבחן מסכם בסיום השתלמות</h1>
+
+  @if (isDemo) {
+    <p class="demo-banner">
+      מצב דמו: הטופס הזה נשמר רק בדפדפן הזה (localStorage) למשך שעה אחת מהעדכון האחרון, ולא בענן.
+    </p>
+  }
 
   <p class="usage-hint">
     יש למלא את כל השדות בטופס, כולל סימון "בוצע"/"לא ביצע" עבור כל פריט בצ'ק-ליסט - זה תנאי לשיתוף בסוף.

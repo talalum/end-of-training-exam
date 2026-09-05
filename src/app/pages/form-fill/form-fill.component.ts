@@ -1,8 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ExamForm, PassFail } from '../../models/exam-form.model';
-import { StorageService } from '../../services/storage.service';
+import { ExamsRepository } from '../../services/exams-repository';
 import { ShareService } from '../../services/share.service';
+import { DEMO_MODE, ROUTE_BASE } from '../../tokens';
 import {
   EMERGENCY_EVALUATION_CRITERIA,
   EMERGENCY_SCENARIOS,
@@ -31,6 +32,9 @@ export class FormFillComponent implements OnInit {
   readonly scenarioCriteria = EMERGENCY_EVALUATION_CRITERIA;
   readonly skillIndexes = [0, 1] as const;
 
+  protected routeBase = inject(ROUTE_BASE);
+  protected isDemo = inject(DEMO_MODE);
+
   model!: ExamForm;
   savedMessage = signal<string | null>(null);
   validationMessage = signal<string | null>(null);
@@ -39,7 +43,7 @@ export class FormFillComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private storage: StorageService,
+    private storage: ExamsRepository,
     private share: ShareService
   ) {}
 
@@ -52,7 +56,7 @@ export class FormFillComponent implements OnInit {
     } else {
       this.model = this.storage.createBlank();
       await this.storage.save(this.model);
-      this.router.navigate(['/form', this.model.id], { replaceUrl: true });
+      this.router.navigate([`${this.routeBase}/form`, this.model.id], { replaceUrl: true });
     }
   }
 
@@ -114,7 +118,7 @@ export class FormFillComponent implements OnInit {
   async deleteAndExit(): Promise<void> {
     if (!confirm('למחוק את הטופס? לא ניתן לשחזר.')) return;
     await this.storage.remove(this.model.id);
-    this.router.navigate(['/']);
+    this.router.navigate([this.routeBase || '/']);
   }
 
   private attemptShare(action: () => void | Promise<void>): void {

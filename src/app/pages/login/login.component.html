@@ -1,23 +1,32 @@
 <main class="login-page">
-  <form class="login-card" (ngSubmit)="onSubmit()">
-    <h1>התחברות</h1>
-    <p class="usage-hint">יש להתחבר עם המייל והסיסמה שהוגדרו עבורך במערכת.</p>
+  <div class="login-wrapper">
+    <h1 class="welcome-title">ברוכים הבאים למערכת בחינות סיום השתלמות</h1>
 
-    <label>
-      אימייל
-      <input type="email" name="email" [(ngModel)]="email" required autocomplete="username" />
-    </label>
-    <label>
-      סיסמה
-      <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
-    </label>
+    <form class="login-card" (ngSubmit)="onSubmit()">
+      <h2>התחברות</h2>
+      <p class="usage-hint">יש להתחבר עם המייל והסיסמה שהוגדרו עבורך במערכת.</p>
 
-    @if (errorMessage()) {
-      <p class="error-message">{{ errorMessage() }}</p>
-    }
+      <label>
+        אימייל
+        <input type="email" name="email" [(ngModel)]="email" required autocomplete="username" />
+      </label>
+      <label>
+        סיסמה
+        <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+      </label>
 
-    <button type="submit" class="btn btn-primary" [disabled]="loading()">
-      {{ loading() ? 'מתחבר...' : 'התחברות' }}
-    </button>
-  </form>
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        {{ loading() ? 'מתחבר...' : 'התחברות' }}
+      </button>
+
+      <a class="demo-link" routerLink="/demo">
+        צפייה בדמו של המערכת
+        <span class="demo-note">(נשמר מקומית בדפדפן שלך בלבד, למשך שעה אחת - ללא התחברות)</span>
+      </a>
+    </form>
+  </div>
 </main>

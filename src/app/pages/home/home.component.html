@@ -2,7 +2,10 @@
   <header class="page-header">
     <h1>צ'ק ליסט לבוחן – מבחן מסכם</h1>
     <div class="header-actions">
-      <a class="btn btn-primary" routerLink="/form">+ טופס חדש</a>
+      <a class="btn btn-primary" [routerLink]="routeBase + '/form'">+ טופס חדש</a>
+      @if (isDemo) {
+        <a class="btn btn-ghost" routerLink="/login">← חזרה להתחברות</a>
+      }
       @if (authService.user()) {
         <button type="button" class="btn btn-ghost" (click)="logout()">
           {{ authService.user()?.email }} · התנתקות
@@ -11,9 +14,18 @@
     </div>
   </header>
 
+  @if (isDemo) {
+    <p class="demo-banner">
+      מצב דמו: הנתונים בעמוד הזה נשמרים רק בדפדפן הזה (localStorage) למשך שעה אחת מהעדכון האחרון, ולא
+      בענן. לאחר שעה הטפסים יימחקו אוטומטית.
+    </p>
+  }
+
   <p class="usage-hint">
-    לחצו על "טופס חדש" כדי להתחיל מבחן חדש, או על טופס קיים ברשימה כדי להמשיך למלא אותו. הטפסים נשמרים
-    במסד נתונים משותף (Firebase) וזמינים מכל מכשיר מחובר.
+    לחצו על "טופס חדש" כדי להתחיל מבחן חדש, או על טופס קיים ברשימה כדי להמשיך למלא אותו.
+    @if (!isDemo) {
+      הטפסים נשמרים במסד נתונים משותף (Firebase) וזמינים מכל מכשיר מחובר.
+    }
   </p>
 
   <section class="list-section">
@@ -27,7 +39,7 @@
       <ul class="forms-list">
         @for (form of forms(); track form.id) {
           <li class="form-card">
-            <a class="form-card-link" [routerLink]="['/form', form.id]">
+            <a class="form-card-link" [routerLink]="[routeBase + '/form', form.id]">
               <div class="form-card-main">
                 <span class="examinee-name">{{ form.examineeName || 'ללא שם נבחן' }}</span>
                 <span class="status-badge" [class.status-sent]="form.status === 'sent'">

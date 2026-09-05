@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ExamForm } from '../../models/exam-form.model';
-import { StorageService } from '../../services/storage.service';
+import { ExamsRepository } from '../../services/exams-repository';
 import { AuthService } from '../../services/auth.service';
+import { DEMO_MODE, ROUTE_BASE } from '../../tokens';
 
 @Component({
   selector: 'app-home',
@@ -12,11 +13,14 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
+  protected routeBase = inject(ROUTE_BASE);
+  protected isDemo = inject(DEMO_MODE);
+
   forms = signal<ExamForm[]>([]);
   loading = signal(true);
 
   constructor(
-    private storage: StorageService,
+    private storage: ExamsRepository,
     protected authService: AuthService,
     private router: Router
   ) {
