@@ -43,3 +43,6 @@ Thumbs.db
 
 # Claude Code local session files
 /.claude
+
+# Firebase config - contains real project values, kept local only (see firebase-config.example.ts)
+/src/app/config/firebase-config.ts

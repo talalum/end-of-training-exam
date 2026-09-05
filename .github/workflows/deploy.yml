@@ -27,6 +27,19 @@ jobs:
 
       - run: npm ci
 
+      - name: Write firebase-config.ts from secrets
+        run: |
+          cat > src/app/config/firebase-config.ts <<'EOF'
+          export const FIREBASE_CONFIG = {
+            apiKey: '${{ secrets.FIREBASE_API_KEY }}',
+            authDomain: '${{ secrets.FIREBASE_AUTH_DOMAIN }}',
+            projectId: '${{ secrets.FIREBASE_PROJECT_ID }}',
+            storageBucket: '${{ secrets.FIREBASE_STORAGE_BUCKET }}',
+            messagingSenderId: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}',
+            appId: '${{ secrets.FIREBASE_APP_ID }}',
+          };
+          EOF
+
       - run: npx ng build --base-href "/${{ github.event.repository.name }}/"
 
       - run: cp dist/end-of-training-exam/browser/index.html dist/end-of-training-exam/browser/404.html

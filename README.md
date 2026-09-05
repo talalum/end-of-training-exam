@@ -27,24 +27,55 @@ npm start
    (location) → לבחור מצב אבטחה התחלתי (**Production mode** מומלץ; ניתן גם **Test mode** ולעדכן כללים
    מיד לאחר מכן, כמו בשלב הבא) → **Create**.
 3. באותו מסך של Firestore, בטאב **Rules**, להעתיק את התוכן של הקובץ [`firestore.rules`](firestore.rules)
-   מהריפו הזה ולפרסם (**Publish**). זה מגביל קריאה/כתיבה למשתמשים מחוברים בלבד.
+   מהריפו הזה ולפרסם (**Publish**).
 4. בתפריט הצד, תחת **Security**, ללחוץ על **Authentication** → (בפעם הראשונה) **Get started** → טאב
    **Sign-in method** → להפעיל את ה-provider **Email/Password** → **Save**.
 5. עדיין ב-Authentication, בטאב **Users**, ללחוץ על **Add user** ולהוסיף ידנית אימייל+סיסמה לכל בוחנת/בוחן
-   שצריך גישה (אין הרשמה עצמית באפליקציה).
-6. מעמוד הסקירה הכללית של הפרויקט (Project Overview), ללחוץ על סמל ה-Web (`</>`) כדי לרשום אפליקציית web
+   שצריך גישה (אין הרשמה עצמית באפליקציה). **חשוב:** להעתיק את ה-**User UID** שמופיע לצד כל משתמש שנוצר.
+6. חזרה במסך **Firestore → Data**, ליצור ידנית קולקציה בשם `authorizedUsers`, ובתוכה מסמך (document) אחד
+   לכל משתמש/ת שנוצר/ה בשלב הקודם — כאשר ה-**Document ID** של כל מסמך הוא ה-UID שהועתק (תוכן המסמך יכול
+   להישאר ריק, למשל שדה בודד כמו `name: "..."`). ה-`firestore.rules` שהודבקו קודם דורשים ש-UID של המשתמש
+   המחובר יופיע בקולקציה הזו כתנאי לגישה לנתונים — כך גם אם מישהו ירשם עצמאית מול ה-API הציבורי של
+   Firebase (אפשרי טכנית כל עוד ה-apiKey חשוף, למשל בריפו ציבורי), הוא עדיין לא יוכל לקרוא/לכתוב נתוני
+   מבחנים בלי שה-UID שלו הוזן ידנית כאן.
+7. מעמוד הסקירה הכללית של הפרויקט (Project Overview), ללחוץ על סמל ה-Web (`</>`) כדי לרשום אפליקציית web
    חדשה (או **Add app** אם כבר יש אפליקציות רשומות) → לתת שם (Nickname) → **Register app**. הקונסולה
    תציג את אובייקט ה-config (`apiKey`, `authDomain` וכו') — זה מה שצריך להעתיק לשלב הבא.
    ניתן למצוא את אותו אובייקט גם מאוחר יותר דרך **Project settings** (סמל גלגל השיניים) → **General** →
    **Your apps**.
-7. אם האפליקציה תפורסם ב-GitHub Pages: באותו מסך Authentication, תחת טאב **Settings** →
+8. אם האפליקציה תפורסם ב-GitHub Pages: באותו מסך Authentication, תחת טאב **Settings** →
    **Authorized domains**, יש להוסיף את הדומיין של ה-Pages (למשל `<username>.github.io`) — אחרת
    ההתחברות תיכשל משם.
 
 ### 2. חיבור הקונפיגורציה לאפליקציה
 
-יש לערוך את `src/app/config/firebase-config.ts` ולהחליף את ה-placeholder באובייקט ה-config האמיתי
-שהועתק בשלב הקודם.
+הקובץ `src/app/config/firebase-config.ts` מכיל את הערכים האמיתיים ונמצא ב-`.gitignore` (לא נשמר ב-git),
+כדי שמפתח ה-`apiKey` לא יהיה חלק מהיסטוריית הריפו הציבורי. הריפו כולל במקום זאת קובץ לדוגמה,
+`firebase-config.example.ts`, שכן נשמר ב-git.
+
+**להרצה מקומית:**
+
+1. להעתיק את `src/app/config/firebase-config.example.ts` לקובץ חדש `src/app/config/firebase-config.ts`
+   (באותה תיקייה).
+2. לערוך את הקובץ החדש ולהחליף את ה-placeholder באובייקט ה-config האמיתי שהועתק בשלב הקודם.
+
+**לפריסה (deploy) דרך GitHub Actions:**
+
+ה-workflow (`.github/workflows/deploy.yml`) יוצר את הקובץ אוטומטית בזמן הבנייה, מתוך secrets של הריפו.
+יש להגדיר אותם פעם אחת תחת **Settings → Secrets and variables → Actions → New repository secret**,
+בשמות הבאים (התואמים לשדות ב-config):
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+
+> **הערה:** כפי שצוין למעלה, ה-`apiKey` של Firebase מיועד מלכתחילה להיות גלוי בצד הלקוח — הוא תמיד
+> ייחשף בתוך קובצי ה-JS הבנויים של האתר החי, בלי קשר לאיפה הוא נשמר לפני הבנייה. השמירה שלו כ-secret
+> ולא כקובץ ב-git היא בעיקר לניקיון (למשל, כדי לא להפעיל התראות סריקת-סודות של GitHub) ולא הגנה
+> אמיתית נוספת על הנתונים — ההגנה האמיתית היא כללי ה-Firestore וקולקציית ה-`authorizedUsers`.
 
 ### 3. הגדרות תוכן (לא קשור ל-Firebase)
 

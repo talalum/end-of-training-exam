@@ -2,8 +2,18 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAuthorizedExaminer() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/authorizedUsers/$(request.auth.uid));
+    }
+
     match /exams/{examId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAuthorizedExaminer();
+    }
+
+    // רשימת ה-UID-ים המורשים מנוהלת ידנית מהקונסולה בלבד - אף קליינט לא רשאי לכתוב אליה.
+    match /authorizedUsers/{userId} {
+      allow read, write: if false;
     }
   }
 }
