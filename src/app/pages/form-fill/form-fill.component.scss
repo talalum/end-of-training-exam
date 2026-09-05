@@ -36,6 +36,16 @@ h1 {
   margin-bottom: 20px;
 }
 
+.demo-banner {
+  color: #7a5a00;
+  font-size: 0.85rem;
+  background: #fff6dd;
+  border: 1px solid #f0d98a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
 .meta-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

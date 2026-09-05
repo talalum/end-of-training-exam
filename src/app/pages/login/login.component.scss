@@ -6,9 +6,23 @@
   padding: 16px;
 }
 
-.login-card {
+.login-wrapper {
   width: 100%;
   max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.welcome-title {
+  margin: 0;
+  font-size: 1.4rem;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.login-card {
+  width: 100%;
   background: #fff;
   border-radius: 12px;
   padding: 24px;
@@ -17,7 +31,7 @@
   flex-direction: column;
   gap: 14px;
 
-  h1 {
+  h2 {
     margin: 0;
     font-size: 1.3rem;
   }
@@ -52,4 +66,24 @@ label {
 
 button {
   margin-top: 6px;
+}
+
+.demo-link {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #2563eb;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.demo-note {
+  color: #888;
+  font-size: 0.75rem;
+  text-decoration: none;
 }

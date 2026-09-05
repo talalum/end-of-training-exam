@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
 import { db } from '../firebase-app';
-import { ExamForm } from '../models/exam-form.model';
+import { createBlankExamForm, ExamForm } from '../models/exam-form.model';
+import { ExamsRepository } from './exams-repository';
 
 const COLLECTION = 'exams';
 
 @Injectable({ providedIn: 'root' })
-export class StorageService {
+export class StorageService extends ExamsRepository {
   async getById(id: string): Promise<ExamForm | null> {
     const snap = await getDoc(doc(db, COLLECTION, id));
     return snap.exists() ? (snap.data() as ExamForm) : null;
@@ -28,27 +29,6 @@ export class StorageService {
   }
 
   createBlank(): ExamForm {
-    const now = Date.now();
-    return {
-      id: crypto.randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-      status: 'draft',
-      examineeName: '',
-      dutyNumber: '',
-      branch: '',
-      examinerName: '',
-      examDate: new Date().toISOString().slice(0, 10),
-      part1: { checklist: {}, notes: '', result: null },
-      part2: {
-        skills: [
-          { skillId: null, evaluation: {}, notes: '' },
-          { skillId: null, evaluation: {}, notes: '' },
-        ],
-        notes: '',
-        result: null,
-      },
-      part3: { scenarioId: null, checklist: {}, notes: '' },
-    };
+    return createBlankExamForm();
   }
 }
