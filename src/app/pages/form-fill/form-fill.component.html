@@ -3,6 +3,9 @@
   <header class="page-header">
     <a [routerLink]="routeBase || '/'" class="btn btn-ghost">← חזרה לרשימה</a>
     <div class="header-actions">
+      @if (isDemo) {
+        <a class="btn btn-ghost" routerLink="/login">← חזרה להתחברות</a>
+      }
       @if (savedMessage()) {
         <span class="saved-toast">{{ savedMessage() }}</span>
       }

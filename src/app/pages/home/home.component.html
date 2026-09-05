@@ -3,6 +3,9 @@
     <h1>צ'ק ליסט לבוחן – מבחן מסכם</h1>
     <div class="header-actions">
       <a class="btn btn-primary" [routerLink]="routeBase + '/form'">+ טופס חדש</a>
+      @if (isDemo) {
+        <a class="btn btn-ghost" routerLink="/login">← חזרה להתחברות</a>
+      }
       @if (authService.user()) {
         <button type="button" class="btn btn-ghost" (click)="logout()">
           {{ authService.user()?.email }} · התנתקות
