@@ -1,19 +1,28 @@
 <main class="page">
   <header class="page-header">
     <h1>צ'ק ליסט לבוחן – מבחן מסכם</h1>
-    <a class="btn btn-primary" routerLink="/form">+ טופס חדש</a>
+    <div class="header-actions">
+      <a class="btn btn-primary" routerLink="/form">+ טופס חדש</a>
+      @if (authService.user()) {
+        <button type="button" class="btn btn-ghost" (click)="logout()">
+          {{ authService.user()?.email }} · התנתקות
+        </button>
+      }
+    </div>
   </header>
 
   <p class="usage-hint">
     לחצו על "טופס חדש" כדי להתחיל מבחן חדש, או על טופס קיים ברשימה כדי להמשיך למלא אותו. הטפסים נשמרים
-    כטיוטה במכשיר/בדפדפן הזה בלבד (לא בענן), ומוצגים כאן למשך 24 שעות מהעדכון האחרון שלהם.
+    במסד נתונים משותף (Firebase) וזמינים מכל מכשיר מחובר.
   </p>
 
   <section class="list-section">
-    <h2>טפסים וטיוטות מ-24 השעות האחרונות</h2>
+    <h2>כל הטפסים</h2>
 
-    @if (forms().length === 0) {
-      <p class="empty-state">אין טפסים או טיוטות מה-24 השעות האחרונות. ניתן להתחיל טופס חדש.</p>
+    @if (loading()) {
+      <p class="empty-state">טוען...</p>
+    } @else if (forms().length === 0) {
+      <p class="empty-state">אין עדיין טפסים. ניתן להתחיל טופס חדש.</p>
     } @else {
       <ul class="forms-list">
         @for (form of forms(); track form.id) {

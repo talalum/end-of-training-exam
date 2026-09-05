@@ -1,0 +1,23 @@
+<main class="login-page">
+  <form class="login-card" (ngSubmit)="onSubmit()">
+    <h1>התחברות</h1>
+    <p class="usage-hint">יש להתחבר עם המייל והסיסמה שהוגדרו עבורך במערכת.</p>
+
+    <label>
+      אימייל
+      <input type="email" name="email" [(ngModel)]="email" required autocomplete="username" />
+    </label>
+    <label>
+      סיסמה
+      <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+    </label>
+
+    @if (errorMessage()) {
+      <p class="error-message">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="loading()">
+      {{ loading() ? 'מתחבר...' : 'התחברות' }}
+    </button>
+  </form>
+</main>
