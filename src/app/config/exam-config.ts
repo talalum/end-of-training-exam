@@ -75,5 +75,3 @@ export const EMAIL_RECIPIENTS: string[] = ['talalum@gmail.com'];
 
 /** מספר טלפון קבוע (אופציונלי, בפורמט בינלאומי ללא +) לשיתוף בוואטסאפ. ריק = הנמען נבחר ידנית בתוך וואטסאפ. */
 export const WHATSAPP_SHARE_PHONE = '0546135311';
-
-export const DRAFTS_VISIBILITY_WINDOW_MS = 24 * 60 * 60 * 1000;

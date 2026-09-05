@@ -1,50 +1,30 @@
 import { Injectable } from '@angular/core';
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
+import { db } from '../firebase-app';
 import { ExamForm } from '../models/exam-form.model';
-import { DRAFTS_VISIBILITY_WINDOW_MS } from '../config/exam-config';
 
-const STORAGE_KEY = 'eote.exam-forms.v1';
+const COLLECTION = 'exams';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
-  private readAll(): ExamForm[] {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    try {
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
+  async getById(id: string): Promise<ExamForm | null> {
+    const snap = await getDoc(doc(db, COLLECTION, id));
+    return snap.exists() ? (snap.data() as ExamForm) : null;
   }
 
-  private writeAll(forms: ExamForm[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(forms));
+  async save(form: ExamForm): Promise<void> {
+    await setDoc(doc(db, COLLECTION, form.id), form);
   }
 
-  getById(id: string): ExamForm | null {
-    return this.readAll().find((f) => f.id === id) ?? null;
+  async remove(id: string): Promise<void> {
+    await deleteDoc(doc(db, COLLECTION, id));
   }
 
-  save(form: ExamForm): void {
-    const forms = this.readAll();
-    const index = forms.findIndex((f) => f.id === form.id);
-    if (index >= 0) {
-      forms[index] = form;
-    } else {
-      forms.push(form);
-    }
-    this.writeAll(forms);
-  }
-
-  remove(id: string): void {
-    this.writeAll(this.readAll().filter((f) => f.id !== id));
-  }
-
-  /** טפסים/טיוטות שעודכנו ב-24 השעות האחרונות, מהחדש לישן. */
-  getRecent(now: number = Date.now()): ExamForm[] {
-    return this.readAll()
-      .filter((f) => now - f.updatedAt <= DRAFTS_VISIBILITY_WINDOW_MS)
-      .sort((a, b) => b.updatedAt - a.updatedAt);
+  /** כל הטפסים, מהעודכן לאחרונה לישן ביותר. */
+  async getAll(): Promise<ExamForm[]> {
+    const q = query(collection(db, COLLECTION), orderBy('updatedAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as ExamForm);
   }
 
   createBlank(): ExamForm {

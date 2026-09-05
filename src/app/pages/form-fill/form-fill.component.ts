@@ -43,15 +43,15 @@ export class FormFillComponent implements OnInit {
     private share: ShareService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.model = this.storage.getById(id) ?? this.storage.createBlank();
+      this.model = (await this.storage.getById(id)) ?? this.storage.createBlank();
       this.model.dutyNumber ??= '';
       this.model.branch ??= '';
     } else {
       this.model = this.storage.createBlank();
-      this.storage.save(this.model);
+      await this.storage.save(this.model);
       this.router.navigate(['/form', this.model.id], { replaceUrl: true });
     }
   }
@@ -78,9 +78,9 @@ export class FormFillComponent implements OnInit {
     return this.computeErrors().length === 0;
   }
 
-  save(showToast = false): void {
+  async save(showToast = false): Promise<void> {
     this.model.updatedAt = Date.now();
-    this.storage.save(this.model);
+    await this.storage.save(this.model);
     if (showToast) {
       this.savedMessage.set('הטיוטה נשמרה');
       setTimeout(() => this.savedMessage.set(null), 2000);
@@ -88,17 +88,17 @@ export class FormFillComponent implements OnInit {
   }
 
   onSendEmailClick(): void {
-    this.attemptShare(() => {
+    this.attemptShare(async () => {
       this.model.status = 'sent';
-      this.save();
+      await this.save();
       window.location.href = this.share.buildMailtoUrl(this.model);
     });
   }
 
   onSendWhatsAppClick(): void {
-    this.attemptShare(() => {
+    this.attemptShare(async () => {
       this.model.status = 'sent';
-      this.save();
+      await this.save();
       window.open(this.share.buildWhatsAppUrl(this.model), '_blank');
     });
   }
@@ -111,13 +111,13 @@ export class FormFillComponent implements OnInit {
     });
   }
 
-  deleteAndExit(): void {
+  async deleteAndExit(): Promise<void> {
     if (!confirm('למחוק את הטופס? לא ניתן לשחזר.')) return;
-    this.storage.remove(this.model.id);
+    await this.storage.remove(this.model.id);
     this.router.navigate(['/']);
   }
 
-  private attemptShare(action: () => void): void {
+  private attemptShare(action: () => void | Promise<void>): void {
     const errors = this.computeErrors();
     if (errors.length > 0) {
       this.invalidFieldKeys.set(new Set(errors.map((e) => e.key)));

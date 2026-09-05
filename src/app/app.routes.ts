@@ -1,10 +1,13 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { FormFillComponent } from './pages/form-fill/form-fill.component';
+import { LoginComponent } from './pages/login/login.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'form', component: FormFillComponent },
-  { path: 'form/:id', component: FormFillComponent },
+  { path: 'login', component: LoginComponent },
+  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  { path: 'form', component: FormFillComponent, canActivate: [authGuard] },
+  { path: 'form/:id', component: FormFillComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];
